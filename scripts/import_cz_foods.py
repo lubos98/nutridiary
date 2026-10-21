@@ -8,6 +8,8 @@ Download an Open Food Facts product export from https://world.openfoodfacts.org/
 Never put the service-role key into the web app or GitHub.
 """
 import csv, gzip, json, os, sys, time, urllib.request, urllib.error
+# Open Food Facts exports contain exceptionally long ingredient/metadata fields.
+csv.field_size_limit(10 * 1024 * 1024)
 from urllib.parse import urlsplit
 
 def normalize_url(raw):
