@@ -1,0 +1,24 @@
+name: Import Czech food catalog
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 1 * *'
+permissions:
+  contents: read
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Open Food Facts data export
+        run: |
+          curl --fail --location --retry 4 --retry-delay 15 \
+            --output openfoodfacts.csv.gz \
+            https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
+          test -s openfoodfacts.csv.gz
+      - name: Import Czech products into Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python3 scripts/import_cz_foods.py openfoodfacts.csv.gz
