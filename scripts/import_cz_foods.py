@@ -8,8 +8,20 @@ Download an Open Food Facts product export from https://world.openfoodfacts.org/
 Never put the service-role key into the web app or GitHub.
 """
 import csv, gzip, json, os, sys, time, urllib.request, urllib.error
+from urllib.parse import urlsplit
 
-URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
+def normalize_url(raw):
+    raw = raw.strip().strip('"').strip("'").rstrip("/")
+    parsed = urlsplit(raw)
+    if parsed.scheme != "https" or not parsed.hostname:
+        raise SystemExit("SUPABASE_URL must be the HTTPS Project URL (https://<project-ref>.supabase.co).")
+    if not (parsed.hostname.endswith(".supabase.co") or parsed.hostname.endswith(".supabase.in")):
+        raise SystemExit("SUPABASE_URL is not a Supabase project URL. Use Project Settings > API > Project URL, not the dashboard URL.")
+    if parsed.path not in ("", "/", "/rest/v1"):
+        raise SystemExit("SUPABASE_URL contains an unsupported path. Use the Project URL without /rest/v1.")
+    return parsed.scheme + "://" + parsed.netloc
+
+URL = normalize_url(os.environ.get("SUPABASE_URL", ""))
 KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 BATCH = 250
 CZ_TAGS = {"en:czech-republic", "cs:cesko", "cs:ceska-republika"}
@@ -24,6 +36,18 @@ def num(value):
 
 def open_data(path):
     return gzip.open(path, "rt", encoding="utf-8", errors="replace", newline="") if path.endswith(".gz") else open(path, "r", encoding="utf-8", errors="replace", newline="")
+
+def check_catalog():
+    req = urllib.request.Request(URL + "/rest/v1/food_catalog?select=barcode&limit=1", headers={
+        "apikey": KEY, "Authorization": "Bearer " + KEY, "Accept": "application/json"
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=20) as response:
+            response.read()
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", errors="replace")[:350]
+        raise SystemExit(f"Cannot access food_catalog (HTTP {e.code}): {detail}. Check SUPABASE_URL, migration v07 and the API key.") from e
+    print("Supabase food_catalog connection verified.", flush=True)
 
 def upload(rows):
     body = json.dumps(rows, ensure_ascii=False).encode("utf-8")
@@ -45,6 +69,7 @@ def upload(rows):
 def main(path):
     if not URL or not KEY:
         raise SystemExit("Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your terminal.")
+    check_catalog()
     seen = set()
     batch = []
     processed = imported = 0
