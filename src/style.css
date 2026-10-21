@@ -93,3 +93,17 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
  .food-tabs button{font-size:11px}
 }
 @media(max-width:370px){.overview-hero{gap:8px}.calorie-ring{width:100px;height:100px}.calorie-ring>div{width:82px;height:82px}.overview-calories h2{font-size:22px}}
+
+
+/* Portion picker: value and unit, with immediate nutritional preview */
+.portion-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.portion-heading strong{font-size:17px}
+.portion-heading small{margin:0}
+.portion-input{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px}
+.portion-input label{min-width:0}
+.portion-input input,.portion-input select{margin-top:7px}
+.portion-preview{display:flex;flex-direction:column;gap:6px;background:#fff6ef;border:1px solid #f6dbc8;border-radius:14px;padding:15px}
+.portion-preview strong{font-size:23px;color:#ba561e}
+.portion-preview span{font-size:14px}
+.portion-preview small{font-size:12px}
+@media(max-width:370px){.portion-input{grid-template-columns:1fr}}
