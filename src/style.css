@@ -107,3 +107,21 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .portion-preview span{font-size:14px}
 .portion-preview small{font-size:12px}
 @media(max-width:370px){.portion-input{grid-template-columns:1fr}}
+
+
+/* Hydration card — simple shortcuts and collapsible history */
+.water-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;margin:14px 0}
+.water-head{display:flex;justify-content:space-between;align-items:center}
+.water-head>span{font-size:28px}
+.water-head h2{font-size:20px;margin:6px 0 15px}
+.water-head h2 span{color:#2676a9;font-size:19px;margin-left:7px}
+.water-actions{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+.water-actions>button{background:#e8f4fc;color:#19618f}
+.water-actions label{flex:1;min-width:140px;color:#667085;font-size:12px}
+.water-actions input{margin-top:5px}
+.water-actions .secondary{border-color:#c9e3f3}
+.water-card details{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.water-card summary{cursor:pointer;color:#526174;font-size:13px}
+.water-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.water-card>small{margin-top:12px}
+@media(max-width:600px){.water-actions>button{flex:1}.water-actions label{flex-basis:100%}.water-actions .secondary{flex:1}}
