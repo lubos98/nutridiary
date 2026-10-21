@@ -8,7 +8,7 @@ export default async function handler(req,res){
   const timeout=setTimeout(()=>controller.abort(),12000);
   try{
     const response=await fetch('https://world.openfoodfacts.org/cgi/search.pl?'+params.toString(),{signal:controller.signal,headers:{'User-Agent':'NutriDenik/1.0 (personal nutrition diary; contact: https://github.com/lubos98/nutridiary)','Accept':'application/json'}});
-    if(!response.ok)return res.status(502).json({error:'Open Food Facts HTTP '+response.status});
+    if(!response.ok){if(response.status===503||response.status===429){res.setHeader('Cache-Control','public, s-maxage=60');return res.status(503).json({error:'Open Food Facts omezuje vyhledávání (HTTP '+response.status+'). Zkuste to za několik minut.'})}return res.status(502).json({error:'Open Food Facts HTTP '+response.status})}
     const payload=await response.json();
     res.setHeader('Cache-Control','public, s-maxage=300, stale-while-revalidate=600');
     return res.status(200).json({products:Array.isArray(payload.products)?payload.products:[]});
